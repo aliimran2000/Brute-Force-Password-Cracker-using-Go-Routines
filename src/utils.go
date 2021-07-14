@@ -18,3 +18,32 @@ func increment(s *string) {
 	}
 	*s = string(b)
 }
+
+func ByteAddtion(b []byte, add int) string {
+
+	diff := byte(end - start + 1)
+
+	carry := byte(add)
+
+	for i := len(b) - 1; i > -1; i-- {
+		if carry == 0 {
+			break
+		} else if carry >= diff {
+			carry -= diff
+		} else {
+			val := b[i] + carry
+
+			if val > byte(end) {
+				b[i] = byte(end)
+				carry = val - b[i]
+			}
+
+		}
+	}
+
+	if carry == 0 {
+		return string(b)
+	}
+	return string(b)
+
+}
