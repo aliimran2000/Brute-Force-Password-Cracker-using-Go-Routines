@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
-	"math"
+	"strings"
 	"sync"
+
+	"github.com/tredoe/osutil/user/crypt/sha512_crypt"
 )
 
 //cap 65-90
@@ -11,9 +13,11 @@ import (
 
 const start = 97
 const end = 122
-const search = "baaaabc"
+const hashToCrack = "$6$hpKW0d9oSGIXHJpn$ItrRNxxgJE.sYixsZtfrDJyYj9XMheFEcyD1ybc/4gJMrICcchyU/D1gYMN7gQKuA3ZDNuqRWbWm37k3zTyvG1"
 
-var possibilities float64 = math.Pow(float64(len(search)), float64(122-97))
+//const search = "qwert"
+
+//var possibilities float64 = math.Pow(float64(len(search)), float64(122-97))
 
 var wg sync.WaitGroup
 
@@ -50,13 +54,24 @@ func Crack(s string, iters int, c chan int) {
 			breaksearch = true
 		default:
 			increment(&s)
-			if s == search {
+			crypter := sha512_crypt.New()
+			hash, err := crypter.Generate([]byte(s), []byte("$6$hpKW0d9oSGIXHJpn$"))
+			if err != nil {
+				panic(err)
+			}
+
+			if strings.Compare(hashToCrack, hash) == 0 {
 				fmt.Println("Found the value at ", i)
+				fmt.Println("The Password is : ", s)
 				c <- 1
 				breaksearch = true
 			}
 		}
+
 		i++
+		if i > iters {
+			breaksearch = true
+		}
 
 	}
 
@@ -64,16 +79,17 @@ func Crack(s string, iters int, c chan int) {
 }
 
 func main() {
-	var s1 string = "aaaaaab"
-	var s2 string = "baaaaac"
+	var s1 string = "aaaaa"
+	var s2 string = "qweaa"
 
 	recieve := make(chan int)
 
 	wg.Add(1)
-	go Crack(s2, 100000, recieve)
+	go Crack(s2, 1000, recieve)
 	wg.Add(1)
-	go Crack(s1, 100000, recieve)
+	go Crack(s1, 1000, recieve)
 
 	fmt.Println("ending search")
 	wg.Wait()
+
 }
