@@ -49,27 +49,18 @@ func Crack(s string, iters int, c chan int) {
 }
 
 func main() {
-	// args := os.Args[1:]
-	// count, _ := strconv.Atoi(args[0])
-	// threads := get_possibilites() / count
-	// rem := get_possibilites() % count
 
-	// fmt.Println(count, threads, rem) //num of threads to spawn
+	var s1 string = "aaaaa"
+	var s2 string = "qwaaa"
 
-	// var s1 string = "aaaaa"
-	// var s2 string = "qweaa"
+	recieve := make(chan int)
 
-	// recieve := make(chan int)
+	wg.Add(1)
+	go Crack(s2, 10000, recieve)
+	wg.Add(1)
+	go Crack(s1, 10000, recieve)
 
-	// wg.Add(1)
-	// go Crack(s2, 1000, recieve)
-	// wg.Add(1)
-	// go Crack(s1, 1000, recieve)
+	fmt.Println("ending search")
+	wg.Wait()
 
-	// fmt.Println("ending search")
-	// wg.Wait()
-
-	//fmt.Println(get_possibilites())
-	b := []byte("aaa")
-	fmt.Println(ByteAddtion(b, 2))
 }

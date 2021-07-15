@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 func increment(s *string) {
 
 	b := []byte(*s)
@@ -19,31 +21,27 @@ func increment(s *string) {
 	*s = string(b)
 }
 
-func ByteAddtion(b []byte, add int) string {
+func adder(a, b byte) (byte, byte) {
+	ans := b%byte(end-start+1) + a
+	if ans > byte(end) {
+		return byte(a - (ans - byte(end))), (26 - (ans - byte(end)))
+	}
 
-	diff := byte(end - start + 1)
+	return byte(ans), (b % byte(end-start+1))
+
+}
+
+func ByteAddtion(b []byte, add int) string {
 
 	carry := byte(add)
 
 	for i := len(b) - 1; i > -1; i-- {
-		if carry == 0 {
-			break
-		} else if carry >= diff {
-			carry -= diff
-		} else {
-			val := b[i] + carry
-
-			if val > byte(end) {
-				b[i] = byte(end)
-				carry = val - b[i]
-			}
-
-		}
+		by, c := adder(b[i], carry)
+		b[i] = byte(by)
+		fmt.Println(c)
+		carry -= c
 	}
 
-	if carry == 0 {
-		return string(b)
-	}
 	return string(b)
 
 }
