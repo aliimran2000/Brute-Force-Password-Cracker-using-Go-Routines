@@ -1,6 +1,6 @@
 package main
 
-import "fmt"
+import "math"
 
 func increment(s *string) {
 
@@ -21,27 +21,42 @@ func increment(s *string) {
 	*s = string(b)
 }
 
-func adder(a, b byte) (byte, byte) {
-	ans := b%byte(end-start+1) + a
-	if ans > byte(end) {
-		return byte(a - (ans - byte(end))), (26 - (ans - byte(end)))
+//returns the string at count i of base
+func get_pass_at(i int) string {
+	var str string
+	var index = i
+	const basn = base
+
+	for index >= 0 {
+
+		mod := byte(index%basn + start)
+		index = (index / basn) - 1
+		str = string(mod) + str
 	}
 
-	return byte(ans), (b % byte(end-start+1))
+	return str
+}
+
+//return starting integer for starting length from base
+func get_starting_int(lens int) float64 {
+	sum := 0.0
+	for i := 0; i < lens; i++ {
+		sum += math.Pow(float64(base), float64(i))
+	}
+
+	return sum
 
 }
 
-func ByteAddtion(b []byte, add int) string {
+func get_possibilites() uint64 {
 
-	carry := byte(add)
+	args := []int{passwordminlength, passwordmaxlength}
 
-	for i := len(b) - 1; i > -1; i-- {
-		by, c := adder(b[i], carry)
-		b[i] = byte(by)
-		fmt.Println(c)
-		carry -= c
+	var sum uint64
+
+	for i := args[0]; i <= args[1]; i++ {
+		sum += uint64(math.Pow(float64(base+1), float64(i)))
 	}
 
-	return string(b)
-
+	return sum
 }

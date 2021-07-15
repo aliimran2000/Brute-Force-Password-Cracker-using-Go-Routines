@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"strings"
 	"sync"
 
@@ -10,9 +11,10 @@ import (
 
 var wg sync.WaitGroup
 
-func Crack(s string, iters int, c chan int) {
+func Crack(s string, iters int, c chan int, r int) {
 	defer wg.Done()
 
+	fmt.Println("routine started")
 	var breaksearch bool = false
 
 	var i int = 0
@@ -38,8 +40,12 @@ func Crack(s string, iters int, c chan int) {
 			}
 		}
 
+		if i%RoutineNotify == 0 {
+			log.Println("Routine : ", r, "Active", s)
+		}
+
 		i++
-		if i > iters {
+		if i >= iters {
 			breaksearch = true
 		}
 
@@ -50,17 +56,29 @@ func Crack(s string, iters int, c chan int) {
 
 func main() {
 
-	var s1 string = "aaaaa"
-	var s2 string = "qwaaa"
+	c := make(chan int, 1)
+	pos := get_possibilites()
+	fmt.Println("Strat Cracking through", pos, "Combinations?")
 
-	recieve := make(chan int)
+	divide := int(pos / MaxNumofRoutines)
+	remain := pos % MaxNumofRoutines
+	fmt.Println(divide, remain)
 
-	wg.Add(1)
-	go Crack(s2, 10000, recieve)
-	wg.Add(1)
-	go Crack(s1, 10000, recieve)
+	index := int(get_starting_int(passwordminlength))
 
-	fmt.Println("ending search")
+	for i := 0; i < MaxNumofRoutines; i++ {
+		str := get_pass_at(index)
+		if len(str) > passwordmaxlength {
+			break
+		}
+		fmt.Println(str)
+		go Crack(str, int(divide), c, i)
+		wg.Add(1)
+		index += divide
+	}
+	log.Println("Passwords have been distributed")
+
 	wg.Wait()
+	log.Println("Search Concluded :) ")
 
 }
